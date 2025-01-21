@@ -1,13 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  useAuth,
+  UserButton,
+  useUser
+} from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import "./App.css";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const { getToken } = useAuth();
+  const { user } = useUser();
+
+  console.log(user);
+
+  const getSomething = async () => {
+    const token = await getToken();
+    await fetch("http://localhost:8000/current-user", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  };
+
+  useEffect(() => {
+    getSomething();
+  }, []);
 
   return (
     <>
+      <header>
+        <SignedOut>
+          <SignInButton />
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </header>
       <div>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -29,7 +62,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
